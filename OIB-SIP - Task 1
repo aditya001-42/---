@@ -1,0 +1,179 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+class User {
+    String username;
+    String password;
+    String profile;
+    Exam exam; 
+
+    User(String username, String password, String profile, Exam exam) {
+        this.username = username;
+        this.password = password;
+        this.profile = profile;
+        this.exam = exam;
+    }
+}
+
+class Question {
+    String question;
+    List<String> options;
+    int correctAnswer;
+
+    Question(String question, List<String> options, int correctAnswer) {
+        this.question = question;
+        this.options = options;
+        this.correctAnswer = correctAnswer;
+    }
+}
+
+class Exam {
+    List<Question> questions;
+    int timer; 
+
+    Exam(List<Question> questions, int timer) {
+        this.questions = questions;
+        this.timer = timer;
+    }
+}
+
+public class Task1 {
+    static Scanner scanner = new Scanner(System.in);
+    static User currentUser;
+
+    public static void main(String[] args) {
+        
+        List<Question> questions = new ArrayList<>();
+        questions.add(new Question("What is the capital of France?", List.of("A. Berlin", "B. Paris", "C. Madrid", "D. Rome"), 1));
+        
+        Exam exam = new Exam(questions, 300); 
+
+        
+        List<User> users = new ArrayList<>();
+        users.add(new User("user1", "password1", "Student", exam));
+        users.add(new User("adi", "adi", "Student", exam));
+       
+
+        boolean isRunning = true;
+        while (isRunning) {
+            System.out.println("1. Login");
+            System.out.println("2. Exit");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+            scanner.nextLine(); 
+
+            switch (choice) {
+                case 1:
+                    login(users);
+                    break;
+                case 2:
+                    isRunning = false;
+                    System.out.println("Exiting the system. Goodbye!");
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+
+    private static void login(List<User> users) {
+        System.out.print("Enter username: ");
+        String username = scanner.nextLine();
+        System.out.print("Enter password: ");
+        String password = scanner.nextLine();
+
+        for (User user : users) {
+            if (user.username.equals(username) && user.password.equals(password)) {
+                currentUser = user;
+                System.out.println("Login successful.");
+                showMainMenu();
+                return;
+            }
+        }
+
+        System.out.println("Invalid username or password. Please try again.");
+    }
+
+    private static void showMainMenu() {
+        boolean isLoggedIn = true;
+        while (isLoggedIn) {
+            System.out.println("\nMain Menu");
+            System.out.println("1. Update Profile and Password");
+            System.out.println("2. Start Exam");
+            System.out.println("3. Logout");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+            scanner.nextLine(); 
+
+            switch (choice) {
+                case 1:
+                    updateProfileAndPassword();
+                    break;
+                case 2:
+                    startExam();
+                    break;
+                case 3:
+                    currentUser = null;
+                    System.out.println("Logout successful.");
+                    isLoggedIn = false;
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+
+    private static void updateProfileAndPassword() {
+        System.out.println("\nUpdate Profile and Password");
+        System.out.println("Current Profile: " + currentUser.profile);
+        System.out.print("Enter new profile: ");
+        String newProfile = scanner.nextLine();
+        currentUser.profile = newProfile;
+
+        System.out.print("Enter new password: ");
+        String newPassword = scanner.nextLine();
+        currentUser.password = newPassword;
+
+        System.out.println("Profile and Password updated successfully.");
+    }
+
+    private static void startExam() {
+        System.out.println("\nStarting Exam...");
+        for (Question question : currentUser.exam.questions) {
+            System.out.println(question.question);
+            for (int i = 0; i < question.options.size(); i++) {
+                System.out.println(question.options.get(i));
+            }
+
+            System.out.print("Enter your answer (A, B, C, or D): ");
+            String userAnswer = scanner.nextLine();
+
+            int userChoice = -1;
+            switch (userAnswer.toUpperCase()) {
+                case "A":
+                    userChoice = 0;
+                    break;
+                case "B":
+                    userChoice = 1;
+                    break;
+                case "C":
+                    userChoice = 2;
+                    break;
+                case "D":
+                    userChoice = 3;
+                    break;
+                default:
+                    System.out.println("Invalid choice. Skipping to the next question.");
+            }
+
+            if (userChoice == question.correctAnswer) {
+                System.out.println("Correct!");
+            } else {
+                System.out.println("Incorrect. The correct answer is: " + question.options.get(question.correctAnswer));
+            }
+        }
+
+        System.out.println("Exam completed. Returning to the main menu.");
+    }
+}
